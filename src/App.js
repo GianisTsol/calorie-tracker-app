@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,31 +10,22 @@ import EditPanel from './Editor.js';
 import Front from './Front.js';
 import Archive from './Archive.js';
 import Settings from './Settings.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const storeData = async (value) => {
-  try {
-    const jsonValue = JSON.stringify(value)
-    await AsyncStorage.setItem('@storage_Key/data', jsonValue)
-  } catch (e) {
-    // saving error
-  }
-}
-
-const getData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('@storage_Key/data')
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  } catch(e) {
-    console.log(e);
-  }
-}
-
+import { useAsyncStorage, storeData, getData } from './BetterAsync.js';
 
 export default function App() {
   const Tab = createBottomTabNavigator();
 
-  const [today, setToday] = React.useState([]);
+  const [today, setToday] = useAsyncStorage('@today', []);
+  const [archive, setArchive] = useAsyncStorage('@slots', []);
+
+  function toArchive() {
+    let kk = new Date().toLocaleString();
+
+    setArchive([...archive, `@archive-${kk}`]);
+    storeData(`@archive-${kk}`, [...today]);
+    setToday([]);
+    console.log("Set today to []")
+  }
 
   function MyTabs({ navigation }) {
     return (
@@ -47,7 +38,7 @@ export default function App() {
         <Tab.Screen
           name="Today"
           component={Front}
-          initialParams={{today: today}}
+          initialParams={{today: today, archive: toArchive}}
           options={{
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
@@ -90,9 +81,8 @@ export default function App() {
   }
 
   const Stack = createNativeStackNavigator();
-  React.useEffect(() => {
-    getData().then((data) => {if (today.length < data.length){setToday(data);} else if (today.length > data.length){storeData(today)}})
-  }, [])
+
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

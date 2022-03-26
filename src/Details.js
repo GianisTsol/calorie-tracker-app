@@ -86,7 +86,6 @@ export default function DetailsPanel({route, navigation}) {
   function eat (amount) {
       let x = route.params.today;
       x.push([props.id, amount]);
-      console.log(x);
       route.params.setToday(x);
       navigation.navigate("Today");
   }

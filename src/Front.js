@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { SafeAreaView, Text, StyleSheet, View, FlatList, Image } from "react-native";
+import { SafeAreaView, Text, StyleSheet, View, FlatList, Image, Pressable } from "react-native";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -48,6 +48,7 @@ const Index = ({route, navigation}) => {
       );
     };
 
+
     return (
         <View style={styles.container}>
           {(today.length > 0) && <><View style={styles.listView}>
@@ -56,6 +57,7 @@ const Index = ({route, navigation}) => {
               style={styles.list}
               keyExtractor={(item, index) => 'key'+index}
               renderItem={(item) => <ItemView item={item.item}/>}/>
+            <Pressable onPress={route.params.archive} style={styles.savebtn}><Text style={styles.btntext}>Archive</Text></Pressable>
           </View>
           </>
         }
@@ -207,6 +209,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     padding: 4,
   },
+  savebtn: {
+    width: "70%",
+    margin: "2%",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: '#ada953',
+    height: "5%",
+  },
+  btntext: {
+    fontSize: 18,
+    fontWeight: "600",
+  }
 });
 
 export default Index;
