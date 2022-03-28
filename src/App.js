@@ -12,22 +12,16 @@ import Archive from './Archive.js';
 import Settings from './Settings.js';
 import { useAsyncStorage, storeData, getData } from './BetterAsync.js';
 
+import Context from './Context.js';
+
 export default function App() {
   const Tab = createBottomTabNavigator();
 
   const [today, setToday] = useAsyncStorage('@today', []);
   const [archive, setArchive] = useAsyncStorage('@slots', []);
 
-  function toArchive() {
-    let kk = new Date().toLocaleString();
-
-    setArchive([...archive, `@archive-${kk}`]);
-    storeData(`@archive-${kk}`, [...today]);
-    setToday([]);
-    console.log("Set today to []")
-  }
-
   function MyTabs({ navigation }) {
+
     return (
       <Tab.Navigator
         initialRouteName="Search"
@@ -38,7 +32,6 @@ export default function App() {
         <Tab.Screen
           name="Today"
           component={Front}
-          initialParams={{today: today, archive: toArchive}}
           options={{
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size }) => (
@@ -84,12 +77,14 @@ export default function App() {
 
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="All" component={MyTabs} options={{headerShown: false,}}/>
-        <Stack.Screen name="Details" component={DetailsPanel} initialParams={{setToday: setToday, today: today}}/>
-        <Stack.Screen name="Edit" component={EditPanel} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Context.Provider value={{today: today, slots: archive, setToday: setToday, setArchive: setArchive}}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="All" component={MyTabs} options={{headerShown: false,}}/>
+          <Stack.Screen name="Details" component={DetailsPanel}/>
+          <Stack.Screen name="Edit" component={EditPanel} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Context.Provider>
   );
 }

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState, useEffect} from 'react';
 
-const useAsyncStorage = <T>(key: string, defaultValue: T): [T, (newValue: T) => void, boolean] => {
+const useAsyncStorage = (key, defaultValue) => {
   const [state, setState] = useState({
     hydrated: false,
     storageValue: defaultValue
@@ -17,7 +17,7 @@ const useAsyncStorage = <T>(key: string, defaultValue: T): [T, (newValue: T) => 
     setState({ hydrated: true, storageValue: value });
   }
 
-  async function updateStorage(newValue: T) {
+  async function updateStorage(newValue) {
     setState({ hydrated: true, storageValue: newValue })
     const stringifiedValue = JSON.stringify(newValue);
     await AsyncStorage.setItem(key, stringifiedValue);
@@ -27,8 +27,10 @@ const useAsyncStorage = <T>(key: string, defaultValue: T): [T, (newValue: T) => 
     pullFromStorage();
   }, []);
 
-  return [storageValue, updateStorage, hydrated];
+  return [state.storageValue, updateStorage];
 };
+
+
 
 const storeData = async (key, value) => {
   try {

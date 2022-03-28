@@ -3,27 +3,10 @@ import { View, StyleSheet, Text, FlatList, Image, TouchableHighlight, TextInput,
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const storeData = async (value) => {
-  try {
-    const jsonValue = JSON.stringify(value)
-    await AsyncStorage.setItem('@storage_Key/data', jsonValue)
-  } catch (e) {
-    // saving error
-  }
-}
-
-const getData = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('@storage_Key/data')
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  } catch(e) {
-    console.log(e);
-  }
-}
-
-
+import Context from './Context.js';
 
 export default function DetailsPanel({route, navigation}) {
+  const cont = React.useContext(Context);
   const props = route.params.data;
 
   if (props.amount === undefined) {
@@ -84,9 +67,9 @@ export default function DetailsPanel({route, navigation}) {
   }
 
   function eat (amount) {
-      let x = route.params.today;
+      let x = cont.today;
       x.push([props.id, amount]);
-      route.params.setToday(x);
+      cont.setToday(x);
       navigation.navigate("Today");
   }
 
@@ -96,7 +79,7 @@ export default function DetailsPanel({route, navigation}) {
     if (index > -1) {
       x.splice(index, 1); // 2nd parameter means remove one item only
     }
-    route.params.setToday(x);
+    cont.setToday(x);
     navigation.navigate("Today");
   }
 

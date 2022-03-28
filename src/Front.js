@@ -1,38 +1,49 @@
 import React, { useState, useEffect } from "react";
 
 import { SafeAreaView, Text, StyleSheet, View, FlatList, Image, Pressable } from "react-native";
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import foods from './assets/foods.json';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+import { useAsyncStorage, storeData, getData } from './BetterAsync.js';
+
+import Context from './Context.js';
+
 
 const Tab = createMaterialTopTabNavigator();
 
 const Index = ({route, navigation}) => {
+    const cont = React.useContext(Context);
 
-  let totalNuts = new Object;
-  let today = new Array;
-
-  route.params.today.map(function ([id, amount], index) {
-    let newfood = JSON.parse(JSON.stringify({...foods[id - 1]}));
-    newfood = {...Object.assign(newfood, {Tindex: index, isToday: true, amount: amount})};
-    for (const [key, value] of Object.entries(newfood.nuts)) {
-      value.value = parseInt(value.value * (amount / 100))
-
-      if (totalNuts[key] === undefined) {
-        totalNuts[key] = JSON.parse(JSON.stringify(value));
+    let today = new Array;
+    cont.today.map(function ([id, amount], index) {
+      let newfood = JSON.parse(JSON.stringify({...foods[id - 1]}));
+      newfood = {...Object.assign(newfood, {Tindex: index, isToday: true, amount: amount})};
+      for (const [key, value] of Object.entries(newfood.nuts)) {
+        value.value = parseInt(value.value * (amount / 100))
       }
-      else {
-        totalNuts[key].value = totalNuts[key].value + JSON.parse(JSON.stringify(value.value));
+      today.push(newfood);
+    });
+
+    let totalNuts = new Object;
+    today.map(function (food, index) {
+      for (const [key, value] of Object.entries(food.nuts)) {
+        if (totalNuts[key] === undefined) {
+          totalNuts[key] = JSON.parse(JSON.stringify(value));
+        }
+        else {
+          totalNuts[key].value = totalNuts[key].value + JSON.parse(JSON.stringify(value.value));
+        }
       }
+    });
+    function toArchive() {
+      //let kk = new Date().toLocaleString();
+      //setArchive([...archive, `@archive-${kk}`]);
+      //storeData(`@archive-${kk}`, [...today]);
+      cont.setToday([]);
+      console.log(today);
     }
-    today.push(newfood);
-  });
-
 
   const Front = () => {
-
     const getItem = (item) => {
       navigation.navigate('Details', {data: item});
     };
@@ -57,7 +68,7 @@ const Index = ({route, navigation}) => {
               style={styles.list}
               keyExtractor={(item, index) => 'key'+index}
               renderItem={(item) => <ItemView item={item.item}/>}/>
-            <Pressable onPress={route.params.archive} style={styles.savebtn}><Text style={styles.btntext}>Archive</Text></Pressable>
+            <Pressable onPress={toArchive} style={styles.savebtn}><Text style={styles.btntext}>Archive</Text></Pressable>
           </View>
           </>
         }

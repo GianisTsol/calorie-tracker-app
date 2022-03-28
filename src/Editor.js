@@ -6,7 +6,6 @@ function saveChanges(data) {
 }
 
 const NutrientEntry = (props) => {
-  console.log(props);
   props.nutrient.value = props.nutrient.value.toString();
   const [value, setValue] = useState(props.nutrient.value);
   return(

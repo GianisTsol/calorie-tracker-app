@@ -7,13 +7,9 @@ import foods from "./assets/foods.json"
 
 const Searcher = ({props, navigation}) => {
   const [search, setSearch] = useState("");
-  const [filteredDataSource, setFilteredDataSource] = useState([]);
-  const [masterDataSource, setMasterDataSource] = useState([]);
+  const [filteredDataSource, setFilteredDataSource] = useState(foods);
+  const [masterDataSource, setMasterDataSource] = useState(foods);
 
-  useEffect(() => {
-    setFilteredDataSource(foods);
-    setMasterDataSource(foods);
-  }, []);
 
   const searchFilterFunction = (text) => {
     // Check if searched text is not blank
