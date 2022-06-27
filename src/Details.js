@@ -69,12 +69,13 @@ export default function DetailsPanel({route, navigation}) {
   function eat (amount) {
       let x = cont.today;
       x.push([props.id, amount]);
+      cont.today = x;
       cont.setToday(x);
       navigation.navigate("Today");
   }
 
   function rem () {
-    let x = route.params.today;
+    let x = cont.today;
     const index = props.Tindex;
     if (index > -1) {
       x.splice(index, 1); // 2nd parameter means remove one item only

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TextInput, Button, FlatList } from 'react-native';
-
-function saveChanges(data) {
-
-}
+import Context from './Context.js';
 
 const NutrientEntry = (props) => {
   props.nutrient.value = props.nutrient.value.toString();
@@ -21,24 +18,36 @@ const NutrientEntry = (props) => {
 }
 
 export default function Editor({route, navigation}) {
+  const cont = React.useContext(Context);
+
   const [name, setName] = useState(route.params.name);
-  const [image, setImage] = useState(route.params.image);
+  const [notes, setNotes] = useState(route.params.image);
 
   var formated = [];
   for (const [key, value] of Object.entries(route.params.nuts)) {
     formated.push({name: key, nutrient: value});
   };
 
+
+  const saveChanges = (data) => {
+    const index = cont.foods.map(object => object.id).indexOf(data.id);
+    var foods = cont.foods;
+    foods[index] = data;
+    cont.foods = foods;
+    cont.setFoods(foods);
+    navigation.goBack();
+  }
+
   return (
     <View style={{width: "100%", flexDirection: "column", height: "100%"}}>
       <Text>Food id: {route.params.id}</Text>
-      <Button title={"Save"} onPress={() => {}}/>
+      <Button title={"Save"} onPress={() => {saveChanges(route.params)}}/>
 
       <Text style={styles.inputLabel}>Name: </Text>
       <TextInput style={styles.input} onChangeText={setName} value={name}/>
 
-      <Text style={styles.inputLabel}>Image uri: </Text>
-      <TextInput style={styles.input} onChangeText={setImage} value={image}/>
+      <Text style={styles.inputLabel}>Notes: </Text>
+      <TextInput style={styles.input} onChangeText={setNotes} value={notes} numberOfLines={3} ellipsizeMode='tail' multiline={true}/>
 
       <View style={{height: 3, backgroundColor: "grey", width: "100%"}}/>
       <FlatList
@@ -53,7 +62,7 @@ export default function Editor({route, navigation}) {
 
 const styles = StyleSheet.create({
   input: {
-    height: 40,
+    //height: 40,
     margin: 12,
     marginTop: 1,
     borderWidth: 1,

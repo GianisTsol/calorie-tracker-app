@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 
-import { SafeAreaView, Text, StyleSheet, View, FlatList, Image } from "react-native";
+import { SafeAreaView, Text, StyleSheet, View, FlatList} from "react-native";
 import { SearchBar } from "react-native-elements";
 
-import foods from "./assets/foods.json"
+import Context from './Context.js';
+
 
 const Searcher = ({props, navigation}) => {
+  const cont = React.useContext(Context);
+  let foods = cont.foods;
+  foods.sort((a, b) => (a.name > b.name) ? 1 : -1);
+
   const [search, setSearch] = useState("");
   const [filteredDataSource, setFilteredDataSource] = useState(foods);
   const [masterDataSource, setMasterDataSource] = useState(foods);
-
 
   const searchFilterFunction = (text) => {
     // Check if searched text is not blank
@@ -17,7 +21,7 @@ const Searcher = ({props, navigation}) => {
       // Inserted text is not blank
       // Filter the masterDataSource
       // Update FilteredDataSource
-      const newData = masterDataSource.filter(function (item) {
+      var newData = masterDataSource.filter(function (item) {
         const itemData = item.name
           ? item.name.toUpperCase()
           : "".toUpperCase();
@@ -35,11 +39,8 @@ const Searcher = ({props, navigation}) => {
   };
 
   const ItemView = ({ item }) => {
-    if (item.image === undefined || item.image == "")
-      {item.image = "https://socialistmodernism.com/wp-content/uploads/2017/07/placeholder-image.png?w=150"};
     return (
       <View style={styles.foodView}>
-        <Image source={{ uri: item.image }} style={styles.foodImage}/>
         <Text style={styles.itemStyle} onPress={() => getItem(item)}>
           {item.name.toUpperCase()}
         </Text>
@@ -66,31 +67,32 @@ const Searcher = ({props, navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safev}>
-      <View style={styles.container}>
-        <SearchBar
-          round
-          lightTheme
-          searchIcon={{ size: 24 }}
-          onChangeText={(text) => searchFilterFunction(text)}
-          onClear={(text) => searchFilterFunction("")}
-          placeholder="Type Here..."
-          value={search}
-          style={styles.bar}
-        />
-        <ItemSeparatorView/>
-        <FlatList
-          data={filteredDataSource}
-          style={styles.list}
-          keyExtractor={item => item.id}
-          renderItem={(item) => <View key={item.item.id}>
-                                  <ItemView item={item.item}/>
-                                  <ItemSeparatorView/>
-                                </View>
-                      }
-        />
-      </View>
-    </SafeAreaView>
+      <SafeAreaView style={styles.safev}>
+        <View style={styles.container}>
+          <SearchBar
+            round
+            lightTheme
+            searchIcon={{ size: 24 }}
+            onChangeText={(text) => searchFilterFunction(text)}
+            onClear={(text) => searchFilterFunction("")}
+            placeholder="Type Here..."
+            value={search}
+            inputStyle={styles.bar}
+            showLoading={true}
+          />
+          <ItemSeparatorView/>
+          <FlatList
+            data={filteredDataSource}
+            style={styles.list}
+            keyExtractor={item => item.id}
+            renderItem={(item) => <View key={item.item.id}>
+                                    <ItemView item={item.item}/>
+                                    <ItemSeparatorView/>
+                                  </View>
+                        }
+          />
+        </View>
+      </SafeAreaView>
   );
 };
 
@@ -107,6 +109,7 @@ const styles = StyleSheet.create({
   bar: {
     marginBottom: 2,
     width: "100%",
+    height: 10,
   },
   safev: {
     flex: 1,
@@ -121,11 +124,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  },
-  foodImage: {
-    resizeMode: 'cover',
-    width: 100,
-    height: 100,
   },
 });
 

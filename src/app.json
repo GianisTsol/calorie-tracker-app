@@ -30,6 +30,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": ""
+    "description": "",
+    "githubUrl": "https://github.com/GianisTsol/calorie-tracker-app"
   }
 }
